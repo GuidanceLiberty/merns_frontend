@@ -1,25 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+// App.js
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useAuthContext } from './hooks/useAuthContext'
+
+// PAGES & COMPONENTS
+import Home from './pages/Home'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
+import Navbar from './components/Navbar'
+
+// ✅ Import the context provider
+import { WorkoutsContextProvider } from './context/WorkoutContext'
 
 function App() {
+  const { user } = useAuthContext()
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {/* ✅ Wrap your app in the provider */}
+      <WorkoutsContextProvider>
+        <BrowserRouter>
+          <Navbar />
+          <div className='pages'>
+            <Routes>
+              <Route path='/' element={user ? <Home /> : <Navigate to="/login" />}
+               />
+
+              <Route path='/login' element={!user ? <Login /> : <Navigate to="/" />} 
+              />
+
+              <Route path='/signup' element={!user ?<Signup /> : <Navigate to="/" />}
+               />
+            </Routes>
+          </div>
+        </BrowserRouter>
+      </WorkoutsContextProvider>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
