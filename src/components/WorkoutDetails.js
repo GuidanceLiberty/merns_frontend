@@ -1,46 +1,48 @@
-import { useWorkoutsContext } from "../hooks/useWorkoutContext"
+import { useWorkoutsContext } from "../hooks/useWorkoutContext";
 import { RiDeleteBinLine } from '@remixicon/react';
-//date fns
-import formatDistanceToNow from 'date-fns/formatDistanceToNow'
-import { useAuthContext } from '../hooks/useAuthContext'
+import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import { useAuthContext } from '../hooks/useAuthContext';
 
 const WorkoutDetails = ({ workout }) => {
-  const { dispatch } = useWorkoutsContext()
-  const URL = process.env.REACT_APP_MAIN_URL;
-  const {user} = useAuthContext()
+  const { dispatch } = useWorkoutsContext();
+  const { user } = useAuthContext();
+  const BASE_URL = process.env.REACT_APP_MAIN_URL || 'http://localhost:4000/api';
 
   const handleClick = async () => {
-    if(!user) {
-      return
-    }
-    const response = await fetch(`${URL}workouts/` + workout._id, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${user.token}`
+    if (!user) return;
+
+    try {
+      const response = await fetch(`${BASE_URL}/workouts/${workout._id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Delete failed:', errorText);
+        return;
       }
-    });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Delete failed:', errorText);
-      return;
+      const json = await response.json();
+      dispatch({ type: 'DELETE_WORKOUT', payload: json });
+    } catch (error) {
+      console.error('❌ Error deleting workout:', error.message);
     }
-
-    const json = await response.json();
-    dispatch({ type: 'DELETE_WORKOUT', payload: json });
-  }
+  };
 
   return (
     <div className="workout-details">
       <h4>{workout.title}</h4>
       <p><strong>Load (kg):</strong> {workout.load}</p>
       <p><strong>Reps:</strong> {workout.reps}</p>
-      <p>{formatDistanceToNow(new Date(workout.createdAt), { addSuffix: true})}</p>
+      <p>{formatDistanceToNow(new Date(workout.createdAt), { addSuffix: true })}</p>
       <span onClick={handleClick}>
-        <RiDeleteBinLine size={24} color="red"/>
+        <RiDeleteBinLine size={24} color="red" />
       </span>
     </div>
-  )
-}
+  );
+};
 
-export default WorkoutDetails
+export default WorkoutDetails;
