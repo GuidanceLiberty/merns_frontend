@@ -7,14 +7,14 @@ export const useSignup = () => {
 
   const { dispatch } = useAuthContext();
 
-  const BASE_URL = process.env.REACT_APP_MAIN_URL || 'http://localhost:4000/api';
+  const BASE_URL = process.env.REACT_APP_MAIN_URL || 'http://localhost:4000';
 
   const signup = async (email, password) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`${BASE_URL}/user/signup`, {
+      const response = await fetch(`${BASE_URL}/api/user/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
